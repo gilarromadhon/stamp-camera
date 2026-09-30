@@ -8,16 +8,20 @@ const RATIO = 0.75 // sisi pendek / sisi panjang perangko
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
 /* ---------- Perangko: lubang perforasi di tepi ---------- */
-function perforate(ctx, w, h, s) {
+function holePath(ctx, w, h, s) {
   const r = 4.2 * s
   const nx = Math.max(4, Math.round(w / (11 * s)))
   const ny = Math.max(4, Math.round(h / (11 * s)))
-  ctx.save()
-  ctx.globalCompositeOperation = 'destination-out'
   ctx.beginPath()
   const dot = (x, y) => { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2) }
   for (let i = 0; i < nx; i++) { const x = (w * (i + 0.5)) / nx; dot(x, 0); dot(x, h) }
   for (let j = 0; j < ny; j++) { const y = (h * (j + 0.5)) / ny; dot(0, y); dot(w, y) }
+}
+
+function perforate(ctx, w, h, s) {
+  ctx.save()
+  ctx.globalCompositeOperation = 'destination-out'
+  holePath(ctx, w, h, s)
   ctx.fill()
   ctx.restore()
 }
@@ -64,6 +68,7 @@ export default function App() {
   const videoRef = useRef(null)
   const topCanvas = useRef(null)
   const frameCanvas = useRef(null)
+  const holesCanvas = useRef(null)
   const streamRef = useRef(null)
 
   const [facing, setFacing] = useState('environment')
@@ -167,21 +172,47 @@ export default function App() {
     perforate(ctx, c.width, c.height, dpr)
   }, [sw, sh, bg])
 
-  /* Preview langsung di layout atas */
+  /* Lubang perforasi preview: digambar sekali (warna latar), bukan tiap frame */
+  const pd = Math.min(window.devicePixelRatio || 1, 2)
+  useEffect(() => {
+    const c = holesCanvas.current
+    if (!c || !sw) return
+    c.width = Math.round(sw * pd)
+    c.height = Math.round(sh * pd)
+    const ctx = c.getContext('2d')
+    ctx.fillStyle = bg
+    holePath(ctx, c.width, c.height, pd)
+    ctx.fill()
+  }, [sw, sh, bg, result, pd])
+
+  /* Preview langsung di layout atas: hanya drawImage per frame video baru */
   useEffect(() => {
     if (result || !sw) return
-    let raf
-    const dpr = window.devicePixelRatio || 1
+    const v = videoRef.current
+    const c = topCanvas.current
+    c.width = Math.round(sw * pd)
+    c.height = Math.round(sh * pd)
+    const ctx = c.getContext('2d', { alpha: false })
+    ctx.imageSmoothingQuality = 'low'
+    const useRvfc = 'requestVideoFrameCallback' in v
+    let stop = false
+    let handle
     const tick = () => {
-      const v = videoRef.current, c = topCanvas.current
-      if (v && c && v.videoWidth) {
-        drawStamp(c, v, getCrop(v, box.w, box.h, sw, sh, mirror), mirror, sw, sh, dpr)
+      if (stop) return
+      if (v.videoWidth) {
+        const cr = getCrop(v, box.w, box.h, sw, sh, mirror)
+        ctx.setTransform(mirror ? -1 : 1, 0, 0, 1, mirror ? c.width : 0, 0)
+        ctx.drawImage(v, cr.sx, cr.sy, cr.sw, cr.sh, 0, 0, c.width, c.height)
       }
-      raf = requestAnimationFrame(tick)
+      handle = useRvfc ? v.requestVideoFrameCallback(tick) : requestAnimationFrame(tick)
     }
     tick()
-    return () => cancelAnimationFrame(raf)
-  }, [result, box, sw, sh, mirror])
+    return () => {
+      stop = true
+      if (useRvfc) v.cancelVideoFrameCallback?.(handle)
+      else cancelAnimationFrame(handle)
+    }
+  }, [result, box, sw, sh, mirror, pd])
 
   /* Ambil foto */
   const shoot = async () => {
@@ -249,7 +280,12 @@ export default function App() {
       <div className="half top" style={{ background: bg }}>
         {result
           ? <img src={result.stamp} width={sw} height={sh} alt="Stamp photo" />
-          : <canvas ref={topCanvas} style={{ width: sw, height: sh }} />}
+          : (
+            <div className="stamp-live" style={{ width: sw, height: sh }}>
+              <canvas ref={topCanvas} />
+              <canvas ref={holesCanvas} />
+            </div>
+          )}
         {!result && <div className="hint" style={{ color: bg === '#1e1e1e' ? 'rgba(255,255,255,.5)' : undefined }}>Pinch the bottom screen to resize</div>}
       </div>
 
