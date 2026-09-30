@@ -29,7 +29,7 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .discard svg { width: 16px; height: 16px; display: block; }
 
 .swatches { display: flex; flex-wrap: wrap; gap: 10px; }
-.swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,.5); cursor: pointer; padding: 0; }
+.swatch { width: 25px; height: 25px; border-radius: 50%; border: 2px solid rgba(255,255,255,.5); cursor: pointer; padding: 0; }
 .swatch.sel { border-color: #fff; box-shadow: 0 0 0 2px #111, 0 0 0 4px #fff; }
 
 .flash { position: absolute; inset: 0; background: #fff; opacity: .92; pointer-events: none; z-index: 20; }
@@ -43,15 +43,15 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .hist-head { display: flex; align-items: center; gap: 8px; padding: calc(10px + env(safe-area-inset-top)) 12px 10px; font-weight: 600; }
 .hist-close { width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: #2a2a2a; color: #fff; display: grid; place-items: center; cursor: pointer; }
 .hist-close svg { width: 20px; height: 20px; }
-.hist-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 4px 12px calc(16px + env(safe-area-inset-bottom)); align-content: start; }
-.hist-item { padding: 0; border: 0; border-radius: 10px; overflow: hidden; background: #222; cursor: pointer; }
+.hist-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 4px 12px 16px; align-content: start; align-items: start; }
+.hist-item { padding: 0; border: 0; border-radius: 6px; overflow: hidden; background: #222; cursor: pointer; }
 .hist-item img { display: block; width: 100%; height: auto; }
 .hist-empty { margin: auto; padding: 32px; text-align: center; color: rgba(255,255,255,.65); font-size: 14px; line-height: 1.5; }
 .hist-view { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 0 12px calc(14px + env(safe-area-inset-bottom)); }
 .hist-view img { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
 .hist-actions { display: flex; justify-content: center; align-items: center; gap: 12px; }
 .hist-actions .save { padding: 0 24px; }
-.hist-del { height: 44px; padding: 0 20px; border-radius: 22px; border: 0; background: #ef7a76; color: #111; font-weight: 700; cursor: pointer; }
+.hist-del { height: 40px; padding: 0 20px; border-radius: 22px; border: 0; background: #ef7a76; color: #111; font-weight: 700; cursor: pointer; }
 
 .btn.side.start { justify-self: start; }
 .btn.side.end { justify-self: end; position: relative; }
@@ -70,3 +70,6 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .hist-foot a { width: 44px; height: 44px; border-radius: 50%; background: #2a2a2a; color: #fff; display: grid; place-items: center; }
 .hist-foot a:active { background: #3a3a3a; }
 .hist-foot svg { width: 22px; height: 22px; display: block; }
+
+.hist-top { position: absolute; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom)); z-index: 5; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,.45); }
+.hist-top svg { width: 22px; height: 22px; }

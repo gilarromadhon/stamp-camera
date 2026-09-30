@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { deletePhoto, deliver, listPhotos } from './storage.js'
 
 const LINKEDIN = 'http://linkedin.com/in/gilarromadhon'
@@ -9,6 +9,15 @@ const fmt = (t) => new Date(t).toLocaleString('en-US', { day: 'numeric', month: 
 export default function History({ onClose }) {
   const [items, setItems] = useState(null)
   const [view, setView] = useState(null)
+  const [atBottom, setAtBottom] = useState(false)
+  const gridRef = useRef(null)
+
+  const onScroll = (e) => {
+    const el = e.currentTarget
+    setAtBottom(el.scrollTop > 0 && el.scrollTop + el.clientHeight >= el.scrollHeight - 8)
+  }
+  const toTop = () => gridRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  useEffect(() => setAtBottom(false), [view])
 
   const load = useCallback(async () => {
     const rows = await listPhotos().catch(() => [])
@@ -50,13 +59,18 @@ export default function History({ onClose }) {
       ) : items && items.length === 0 ? (
         <p className="hist-empty">No photos yet. Photos you take appear here and are stored only in this browser.</p>
       ) : (
-        <div className="hist-grid">
+        <div className="hist-grid" ref={gridRef} onScroll={onScroll}>
           {items?.map((i) => (
             <button key={i.id} className="hist-item" onClick={() => setView(i.id)}>
               <img src={i.url} alt={fmt(i.createdAt)} loading="lazy" />
             </button>
           ))}
         </div>
+      )}
+      {!current && atBottom && (
+        <button className="hist-top" onClick={toTop} aria-label="Scroll to top">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M6 15l6-6 6 6" /></svg>
+        </button>
       )}
       {!current && (
         <footer className="hist-foot">
