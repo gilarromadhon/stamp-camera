@@ -10,6 +10,7 @@ export default function History({ onClose }) {
   const [items, setItems] = useState(null)
   const [view, setView] = useState(null)
   const [atBottom, setAtBottom] = useState(false)
+  const [ratios, setRatios] = useState({}) // id -> height / width, so each tile reserves its exact space
   const gridRef = useRef(null)
 
   const onScroll = (e) => {
@@ -61,8 +62,21 @@ export default function History({ onClose }) {
       ) : (
         <div className="hist-grid" ref={gridRef} onScroll={onScroll}>
           {items?.map((i) => (
-            <button key={i.id} className="hist-item" onClick={() => setView(i.id)}>
-              <img src={i.url} alt={fmt(i.createdAt)} loading="lazy" />
+            <button
+              key={i.id}
+              className="hist-item"
+              style={{ aspectRatio: `1 / ${ratios[i.id] || 2.1}` }}
+              onClick={() => setView(i.id)}
+            >
+              <img
+                src={i.url}
+                alt={fmt(i.createdAt)}
+                decoding="async"
+                onLoad={(e) => {
+                  const r = e.currentTarget.naturalHeight / e.currentTarget.naturalWidth
+                  if (r) setRatios((m) => (m[i.id] === r ? m : { ...m, [i.id]: r }))
+                }}
+              />
             </button>
           ))}
         </div>
