@@ -154,10 +154,23 @@ export default function App() {
     }
   }, [])
 
+  // Kamera hanya menyala saat benar-benar dipakai: mati saat riwayat dibuka atau app di background
+  const [pageVisible, setPageVisible] = useState(!document.hidden)
   useEffect(() => {
+    const onVis = () => setPageVisible(!document.hidden)
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [])
+
+  const camActive = pageVisible && !showHistory
+  useEffect(() => {
+    if (!camActive) return
     startCamera(facing)
-    return () => streamRef.current?.getTracks().forEach((t) => t.stop())
-  }, [facing, startCamera])
+    return () => {
+      streamRef.current?.getTracks().forEach((t) => t.stop())
+      streamRef.current = null
+    }
+  }, [facing, camActive, startCamera])
 
   /* Mask perangko berwarna latar di atas kamera */
   useEffect(() => {
