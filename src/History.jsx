@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { deletePhoto, deliver, listPhotos } from './storage.js'
+import { addPhoto, deletePhoto, deliver, listPhotos } from './storage.js'
+import { FILTERS, renderFiltered, thumbnail } from './filters.js'
 
 const WEBSITE = 'https://www.gilarromadhon.web.id/'
 
@@ -13,6 +14,11 @@ export default function History({ onClose }) {
   const touch = useRef(null)
   const [ratios, setRatios] = useState({}) // id -> height / width, so each tile reserves its exact space
   const gridRef = useRef(null)
+  const [filter, setFilter] = useState('original')
+  const [srcImg, setSrcImg] = useState(null) // decoded <img> of the open photo
+  const [thumbs, setThumbs] = useState({})
+  const [edit, setEdit] = useState(null) // { canvas, url } for the active filter
+  const [note, setNote] = useState('')
 
   const onScroll = (e) => {
     const el = e.currentTarget
@@ -71,6 +77,50 @@ export default function History({ onClose }) {
     return () => window.removeEventListener('keydown', key)
   }, [current, go])
 
+  /* Filters: reset + decode the photo whenever a different one is opened */
+  useEffect(() => {
+    setFilter('original')
+    setSrcImg(null)
+    setThumbs({})
+    if (!current) return
+    let dead = false
+    const img = new Image()
+    img.onload = () => {
+      if (dead) return
+      setSrcImg(img)
+      setThumbs(Object.fromEntries(FILTERS.map((f) => [f.id, thumbnail(img, f.id)])))
+    }
+    img.src = current.url
+    return () => { dead = true }
+  }, [current?.id]) // eslint-disable-line
+
+  /* Apply the selected filter (full resolution, shown as preview) */
+  useEffect(() => {
+    if (!srcImg || filter === 'original') { setEdit(null); return }
+    let dead = false
+    const canvas = renderFiltered(srcImg, filter)
+    canvas.toBlob((blob) => {
+      if (dead || !blob) return
+      setEdit((old) => { if (old) URL.revokeObjectURL(old.url); return { canvas, url: URL.createObjectURL(blob) } })
+    }, 'image/jpeg', 0.92)
+    return () => { dead = true }
+  }, [srcImg, filter])
+  useEffect(() => () => { if (edit) URL.revokeObjectURL(edit.url) }, [edit])
+
+  const flashNote = (m) => { setNote(m); setTimeout(() => setNote(''), 1800) }
+  const filteredBlob = () => new Promise((r) => edit.canvas.toBlob(r, 'image/png'))
+  const sendCurrent = async () => {
+    if (!edit) return send(current)
+    deliver(await filteredBlob(), `stamp-${current.createdAt}-${filter}.png`).catch(() => {})
+  }
+  const saveCopy = async () => {
+    try {
+      await addPhoto(await filteredBlob())
+      await load()
+      flashNote('Saved as a new photo')
+    } catch { flashNote('Could not save') }
+  }
+
   return (
     <div className="hist">
       <div className="hist-head">
@@ -91,15 +141,28 @@ export default function History({ onClose }) {
             <img
               key={current.id}
               className={dir > 0 ? 'slide-next' : dir < 0 ? 'slide-prev' : ''}
-              src={current.url}
+              src={edit?.url ?? current.url}
               alt="Saved photo"
               draggable={false}
             />
           </div>
+          <div className="hist-filters" role="listbox" aria-label="Filters">
+            {FILTERS.map((f) => (
+              <button key={f.id} className={'hist-filter' + (f.id === filter ? ' sel' : '')} onClick={() => setFilter(f.id)} disabled={!srcImg}>
+                {thumbs[f.id] ? <img src={thumbs[f.id]} alt="" draggable={false} /> : <span className="ph" />}
+                <span>{f.name}</span>
+              </button>
+            ))}
+          </div>
           <div className="hist-actions">
-            <button className="hist-icon" onClick={() => send(current)} aria-label="Save to device">
+            <button className="hist-icon" onClick={sendCurrent} aria-label="Save to device">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14" /></svg>
             </button>
+            {edit && (
+              <button className="hist-icon" onClick={saveCopy} aria-label="Save filtered copy to history">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2M14 11v6M11 14h6" /></svg>
+              </button>
+            )}
             <button className="hist-icon" onClick={() => remove(current.id)} aria-label="Delete photo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" /></svg>
             </button>
@@ -129,6 +192,7 @@ export default function History({ onClose }) {
           ))}
         </div>
       )}
+      {note && <div className="hist-note">{note}</div>}
       {!current && atBottom && (
         <button className="hist-top" onClick={toTop} aria-label="Scroll to top">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M6 15l6-6 6 6" /></svg>
