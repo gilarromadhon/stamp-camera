@@ -6,7 +6,7 @@ const WEBSITE = 'https://www.gilarromadhon.web.id/'
 
 const fmt = (t) => new Date(t).toLocaleString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
-export default function History({ onClose }) {
+export default function History({ onClose, showFilter = true }) {
   const [items, setItems] = useState(null)
   const [view, setView] = useState(null)
   const [atBottom, setAtBottom] = useState(false)
@@ -82,7 +82,7 @@ export default function History({ onClose }) {
     setFilter('original')
     setSrcImg(null)
     setThumbs({})
-    if (!current) return
+    if (!current || !showFilter) return
     let dead = false
     const img = new Image()
     img.onload = () => {
@@ -92,11 +92,11 @@ export default function History({ onClose }) {
     }
     img.src = current.url
     return () => { dead = true }
-  }, [current?.id]) // eslint-disable-line
+  }, [current?.id, showFilter]) // eslint-disable-line
 
   /* Apply the selected filter (full resolution, shown as preview) */
   useEffect(() => {
-    if (!srcImg || filter === 'original') { setEdit(null); return }
+    if (!showFilter || !srcImg || filter === 'original') { setEdit(null); return }
     let dead = false
     const canvas = renderFiltered(srcImg, filter)
     canvas.toBlob((blob) => {
@@ -104,7 +104,7 @@ export default function History({ onClose }) {
       setEdit((old) => { if (old) URL.revokeObjectURL(old.url); return { canvas, url: URL.createObjectURL(blob) } })
     }, 'image/jpeg', 0.92)
     return () => { dead = true }
-  }, [srcImg, filter])
+  }, [srcImg, filter, showFilter])
   useEffect(() => () => { if (edit) URL.revokeObjectURL(edit.url) }, [edit])
 
   const filteredBlob = () => new Promise((r) => edit.canvas.toBlob(r, 'image/png'))
@@ -138,7 +138,7 @@ export default function History({ onClose }) {
               draggable={false}
             />
           </div>
-          {showFilters && (
+          {showFilter && showFilters && (
           <div className="hist-filters" role="listbox" aria-label="Filters">
             {FILTERS.map((f) => (
               <button key={f.id} className={'hist-filter' + (f.id === filter ? ' sel' : '')} onClick={() => setFilter(f.id)} disabled={!srcImg}>
@@ -149,6 +149,7 @@ export default function History({ onClose }) {
           </div>
           )}
           <div className="hist-actions">
+            {showFilter && (
             <button
               className={'hist-icon' + (showFilters ? ' on' : '') + (filter !== 'original' && !showFilters ? ' dot' : '')}
               onClick={() => setShowFilters((v) => !v)}
@@ -157,6 +158,7 @@ export default function History({ onClose }) {
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="9" r="5" /><circle cx="15" cy="9" r="5" /><circle cx="12" cy="15" r="5" /></svg>
             </button>
+            )}
             <button className="hist-icon" onClick={sendCurrent} aria-label="Save to device">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14" /></svg>
             </button>

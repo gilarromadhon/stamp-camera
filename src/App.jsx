@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import History from './History.jsx'
+import { useFlags } from './flags.js'
 import { addPhoto, deletePhoto } from './storage.js'
 
 const COLORS = ['#ffffff', '#f7d9d9', '#fff0b3', '#d3ecd9', '#d0e2f7', '#e6d8f5', '#1e1e1e']
@@ -83,6 +84,7 @@ export default function App() {
   const [toast, setToast] = useState('')
   const [showHistory, setShowHistory] = useState(false)
   const [menu, setMenu] = useState(false)
+  const flags = useFlags()
   const notify = (m) => { setToast(m); setTimeout(() => setToast(''), 1800) }
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [zoom, setZoom] = useState(0.62) // skala ukuran perangko (pinch in/out)
@@ -353,7 +355,7 @@ export default function App() {
 
       {screenFlash && <div className="flash" />}
       {toast && <div className="toast">{toast}</div>}
-      {showHistory && <History onClose={() => setShowHistory(false)} />}
+      {showHistory && <History showFilter={flags.showButtonFilter} onClose={() => setShowHistory(false)} />}
     </div>
   )
 }
