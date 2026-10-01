@@ -48,10 +48,16 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .hist-item img { display: block; width: 100%; height: 100%; object-fit: fill; }
 .hist-empty { margin: auto; padding: 32px; text-align: center; color: rgba(255,255,255,.65); font-size: 14px; line-height: 1.5; }
 .hist-view { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 12px; padding: 0 12px calc(14px + env(safe-area-inset-bottom)); }
-.hist-view img { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
-.hist-actions { display: flex; justify-content: center; align-items: center; gap: 12px; }
-.hist-actions .save { padding: 0 24px; }
-.hist-del { height: 40px; padding: 0 20px; border-radius: 22px; border: 0; background: #ef7a76; color: #111; font-weight: 700; cursor: pointer; }
+.hist-stage { flex: 1; min-height: 0; display: flex; overflow: hidden; touch-action: pan-y; user-select: none; }
+.hist-stage img { flex: 1; min-width: 0; width: 100%; height: 100%; object-fit: contain; -webkit-user-drag: none; }
+.hist-stage img.slide-next { animation: slide-from-right .22s ease-out; }
+.hist-stage img.slide-prev { animation: slide-from-left .22s ease-out; }
+@keyframes slide-from-right { from { transform: translateX(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes slide-from-left { from { transform: translateX(-40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.hist-actions { display: flex; justify-content: center; align-items: center; gap: 20px; }
+.hist-icon { width: 48px; height: 48px; padding: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.1); color: #fff; display: grid; place-items: center; cursor: pointer; backdrop-filter: blur(6px); }
+.hist-icon:active { background: rgba(255,255,255,.22); }
+.hist-icon svg { width: 22px; height: 22px; }
 
 .btn.side.start { justify-self: start; }
 .btn.side.end { justify-self: end; position: relative; }
@@ -66,7 +72,7 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .menu-row:first-child .menu-label { flex: none; }
 .menu-item em { font-style: normal; color: rgba(255,255,255,.65); }
 
-.hist-foot { display: flex; justify-content: center; gap: 16px; padding: 12px 12px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.08); }
+.hist-foot { display: flex; justify-content: center; align-items: center; gap: 12px; color: rgba(255,255,255,.6); font-size: 13px; padding: 12px 12px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.08); }
 .hist-foot a { width: 44px; height: 44px; border-radius: 50%; background: #2a2a2a; color: #fff; display: grid; place-items: center; }
 .hist-foot a:active { background: #3a3a3a; }
 .hist-foot svg { width: 22px; height: 22px; display: block; }
