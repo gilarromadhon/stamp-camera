@@ -92,3 +92,13 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .hist-icon { position: relative; }
 .hist-icon.on { background: #fff; color: #111; border-color: #fff; }
 .hist-icon.dot::after { content: ''; position: absolute; top: 7px; right: 7px; width: 9px; height: 9px; border-radius: 50%; background: #ffd83d; }
+
+/* Filters float over the photo (like the camera menu) so the photo layout never changes */
+.hist-view { position: relative; }
+.hist-filters {
+  position: absolute; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom) + 48px + 12px);
+  z-index: 10; padding: 12px 10px 10px; border-radius: 20px;
+  background: rgba(24, 24, 24, .82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .4); animation: pop-in .18s ease-out;
+}
+@keyframes pop-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
