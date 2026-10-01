@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { addPhoto, deletePhoto, deliver, listPhotos } from './storage.js'
+import { deletePhoto, deliver, listPhotos } from './storage.js'
 import { FILTERS, renderFiltered, thumbnail } from './filters.js'
 
 const WEBSITE = 'https://www.gilarromadhon.web.id/'
@@ -18,7 +18,7 @@ export default function History({ onClose }) {
   const [srcImg, setSrcImg] = useState(null) // decoded <img> of the open photo
   const [thumbs, setThumbs] = useState({})
   const [edit, setEdit] = useState(null) // { canvas, url } for the active filter
-  const [note, setNote] = useState('')
+  const [showFilters, setShowFilters] = useState(false)
 
   const onScroll = (e) => {
     const el = e.currentTarget
@@ -107,18 +107,10 @@ export default function History({ onClose }) {
   }, [srcImg, filter])
   useEffect(() => () => { if (edit) URL.revokeObjectURL(edit.url) }, [edit])
 
-  const flashNote = (m) => { setNote(m); setTimeout(() => setNote(''), 1800) }
   const filteredBlob = () => new Promise((r) => edit.canvas.toBlob(r, 'image/png'))
   const sendCurrent = async () => {
     if (!edit) return send(current)
     deliver(await filteredBlob(), `stamp-${current.createdAt}-${filter}.png`).catch(() => {})
-  }
-  const saveCopy = async () => {
-    try {
-      await addPhoto(await filteredBlob())
-      await load()
-      flashNote('Saved as a new photo')
-    } catch { flashNote('Could not save') }
   }
 
   return (
@@ -146,6 +138,7 @@ export default function History({ onClose }) {
               draggable={false}
             />
           </div>
+          {showFilters && (
           <div className="hist-filters" role="listbox" aria-label="Filters">
             {FILTERS.map((f) => (
               <button key={f.id} className={'hist-filter' + (f.id === filter ? ' sel' : '')} onClick={() => setFilter(f.id)} disabled={!srcImg}>
@@ -154,15 +147,19 @@ export default function History({ onClose }) {
               </button>
             ))}
           </div>
+          )}
           <div className="hist-actions">
+            <button
+              className={'hist-icon' + (showFilters ? ' on' : '') + (filter !== 'original' && !showFilters ? ' dot' : '')}
+              onClick={() => setShowFilters((v) => !v)}
+              aria-label={showFilters ? 'Hide filters' : 'Show filters'}
+              aria-expanded={showFilters}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="9" r="5" /><circle cx="15" cy="9" r="5" /><circle cx="12" cy="15" r="5" /></svg>
+            </button>
             <button className="hist-icon" onClick={sendCurrent} aria-label="Save to device">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 19h14" /></svg>
             </button>
-            {edit && (
-              <button className="hist-icon" onClick={saveCopy} aria-label="Save filtered copy to history">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2M14 11v6M11 14h6" /></svg>
-              </button>
-            )}
             <button className="hist-icon" onClick={() => remove(current.id)} aria-label="Delete photo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" /></svg>
             </button>
@@ -192,7 +189,6 @@ export default function History({ onClose }) {
           ))}
         </div>
       )}
-      {note && <div className="hist-note">{note}</div>}
       {!current && atBottom && (
         <button className="hist-top" onClick={toTop} aria-label="Scroll to top">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M6 15l6-6 6 6" /></svg>

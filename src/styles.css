@@ -89,4 +89,6 @@ body { background: #1e1e1e; font-family: system-ui, -apple-system, 'Segoe UI', s
 .hist-filter img, .hist-filter .ph { display: block; width: 60px; height: 80px; border-radius: 9px; object-fit: cover; background: #2a2a2a; border: 2px solid transparent; }
 .hist-filter.sel { color: #fff; font-weight: 700; }
 .hist-filter.sel img, .hist-filter.sel .ph { border-color: #fff; }
-.hist-note { position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); padding: 8px 16px; border-radius: 20px; background: #fff; color: #111; font-size: 13px; font-weight: 600; z-index: 50; }
+.hist-icon { position: relative; }
+.hist-icon.on { background: #fff; color: #111; border-color: #fff; }
+.hist-icon.dot::after { content: ''; position: absolute; top: 7px; right: 7px; width: 9px; height: 9px; border-radius: 50%; background: #ffd83d; }
