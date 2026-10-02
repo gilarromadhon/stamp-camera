@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import History from './History.jsx'
+import Onboarding from './Onboarding.jsx'
 import { useFlags } from './flags.js'
 import { addPhoto, deletePhoto } from './storage.js'
 
 const COLORS = ['#ffffff', '#f7d9d9', '#fff0b3', '#d3ecd9', '#d0e2f7', '#e6d8f5', '#1e1e1e']
+const ONBOARD_KEY = 'stamp-cam:onboarded'
 const SHOW_DISCARD = false // set true to bring back the ✕ (delete + retake) button
 const RATIO = 0.75 // sisi pendek / sisi panjang perangko
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -85,6 +87,14 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false)
   const [menu, setMenu] = useState(false)
   const flags = useFlags()
+  // Onboarding is shown only on the very first visit
+  const [onboarded, setOnboarded] = useState(() => {
+    try { return localStorage.getItem(ONBOARD_KEY) === '1' } catch { return false }
+  })
+  const finishOnboarding = () => {
+    try { localStorage.setItem(ONBOARD_KEY, '1') } catch {}
+    setOnboarded(true)
+  }
   const notify = (m) => { setToast(m); setTimeout(() => setToast(''), 1800) }
   const [box, setBox] = useState({ w: 0, h: 0 })
   const [zoom, setZoom] = useState(0.62) // skala ukuran perangko (pinch in/out)
@@ -164,7 +174,7 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange', onVis)
   }, [])
 
-  const camActive = pageVisible && !showHistory
+  const camActive = pageVisible && !showHistory && onboarded // no camera prompt until onboarding is done
   useEffect(() => {
     if (!camActive) return
     startCamera(facing)
@@ -355,6 +365,7 @@ export default function App() {
 
       {screenFlash && <div className="flash" />}
       {toast && <div className="toast">{toast}</div>}
+      {!onboarded && <Onboarding onDone={finishOnboarding} />}
       {showHistory && <History showFilter={flags.showButtonFilter} onClose={() => setShowHistory(false)} />}
     </div>
   )
