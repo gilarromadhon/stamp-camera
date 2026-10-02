@@ -49,7 +49,7 @@ const Sparkle = ({ x, y, s = 1 }) => (
   </g>
 )
 
-const ArtOne = () => (
+const ArtUrl = () => (
   /* Browser window + address bar + globe + cursor  ->  "Just Open the URL" */
   <svg viewBox="0 0 320 360" aria-hidden="true">
     <Defs />
@@ -79,32 +79,7 @@ const ArtOne = () => (
   </svg>
 )
 
-const ArtTwo = () => (
-  /* Gift box with bow + "$0" coin  ->  "Totally Free" */
-  <svg viewBox="0 0 320 360" aria-hidden="true">
-    <Defs />
-    <g filter="url(#grain)">
-      <rect x="84" y="196" width="152" height="112" rx="14" fill="url(#gBlue)" />
-      <rect x="72" y="154" width="176" height="54" rx="14" fill="url(#gLav)" />
-      <rect x="146" y="154" width="28" height="154" fill="url(#gRim)" />
-      <ellipse cx="124" cy="132" rx="36" ry="21" transform="rotate(-24 124 132)" fill="url(#gSun)" />
-      <ellipse cx="196" cy="132" rx="36" ry="21" transform="rotate(24 196 132)" fill="url(#gSun)" />
-      <circle cx="160" cy="146" r="15" fill="url(#gOrange)" />
-      <circle cx="262" cy="258" r="34" fill="url(#gOrange)" />
-      <circle cx="46" cy="214" r="13" fill="url(#gOrange)" />
-    </g>
-    <circle cx="262" cy="258" r="34" fill="none" stroke="#ffd21a" strokeWidth="5" />
-    <text x="262" y="268" textAnchor="middle" fill="#fff" fontSize="28" fontWeight="700" fontFamily="Poppins, Arial, sans-serif">$0</text>
-    <Sparkle x={58} y={110} />
-    <Sparkle x={268} y={96} s={0.8} />
-    <circle cx="236" cy="40" r="11" fill="#fff" />
-    <circle cx="86" cy="52" r="8" fill="#fff" />
-    <ellipse cx="160" cy="324" rx="110" ry="13" fill="none" stroke="#fff" strokeWidth="2" />
-    <ellipse cx="160" cy="348" rx="66" ry="8" fill="none" stroke="#fff" strokeWidth="2" />
-  </svg>
-)
-
-const ArtThree = () => (
+const ArtServer = () => (
   /* Phone with lock + crossed-out cloud  ->  "No Server Storage" */
   <svg viewBox="0 0 320 360" aria-hidden="true">
     <Defs />
@@ -131,10 +106,47 @@ const ArtThree = () => (
   </svg>
 )
 
+const ArtStamp = () => (
+  /* Live shot becomes a perforated stamp instantly  ->  "Instant Stamp Photos" */
+  <svg viewBox="0 0 320 360" aria-hidden="true">
+    <Defs />
+    <defs>
+      <mask id="mStamp" maskUnits="userSpaceOnUse" x="54" y="26" width="212" height="224">
+        <rect x="54" y="26" width="212" height="224" fill="#fff" />
+        <g fill="#000"><circle cx="73.2" cy="38.0" r="6"/><circle cx="73.2" cy="238.0" r="6"/><circle cx="87.7" cy="38.0" r="6"/><circle cx="87.7" cy="238.0" r="6"/><circle cx="102.2" cy="38.0" r="6"/><circle cx="102.2" cy="238.0" r="6"/><circle cx="116.6" cy="38.0" r="6"/><circle cx="116.6" cy="238.0" r="6"/><circle cx="131.1" cy="38.0" r="6"/><circle cx="131.1" cy="238.0" r="6"/><circle cx="145.5" cy="38.0" r="6"/><circle cx="145.5" cy="238.0" r="6"/><circle cx="160.0" cy="38.0" r="6"/><circle cx="160.0" cy="238.0" r="6"/><circle cx="174.5" cy="38.0" r="6"/><circle cx="174.5" cy="238.0" r="6"/><circle cx="188.9" cy="38.0" r="6"/><circle cx="188.9" cy="238.0" r="6"/><circle cx="203.4" cy="38.0" r="6"/><circle cx="203.4" cy="238.0" r="6"/><circle cx="217.8" cy="38.0" r="6"/><circle cx="217.8" cy="238.0" r="6"/><circle cx="232.3" cy="38.0" r="6"/><circle cx="232.3" cy="238.0" r="6"/><circle cx="246.8" cy="38.0" r="6"/><circle cx="246.8" cy="238.0" r="6"/><circle cx="66.0" cy="45.7" r="6"/><circle cx="254.0" cy="45.7" r="6"/><circle cx="66.0" cy="61.1" r="6"/><circle cx="254.0" cy="61.1" r="6"/><circle cx="66.0" cy="76.5" r="6"/><circle cx="254.0" cy="76.5" r="6"/><circle cx="66.0" cy="91.8" r="6"/><circle cx="254.0" cy="91.8" r="6"/><circle cx="66.0" cy="107.2" r="6"/><circle cx="254.0" cy="107.2" r="6"/><circle cx="66.0" cy="122.6" r="6"/><circle cx="254.0" cy="122.6" r="6"/><circle cx="66.0" cy="138.0" r="6"/><circle cx="254.0" cy="138.0" r="6"/><circle cx="66.0" cy="153.4" r="6"/><circle cx="254.0" cy="153.4" r="6"/><circle cx="66.0" cy="168.8" r="6"/><circle cx="254.0" cy="168.8" r="6"/><circle cx="66.0" cy="184.2" r="6"/><circle cx="254.0" cy="184.2" r="6"/><circle cx="66.0" cy="199.5" r="6"/><circle cx="254.0" cy="199.5" r="6"/><circle cx="66.0" cy="214.9" r="6"/><circle cx="254.0" cy="214.9" r="6"/><circle cx="66.0" cy="230.3" r="6"/><circle cx="254.0" cy="230.3" r="6"/></g>
+      </mask>
+    </defs>
+    <g transform="rotate(-4 160 138)">
+      <g mask="url(#mStamp)">
+        <g filter="url(#grain)">
+          <rect x="66" y="38" width="188" height="200" fill="url(#gCone)" />
+          <path d="M66 96 C 104 50 150 130 206 80 S 250 70 254 100 L254 128 C 230 108 190 160 140 128 S 90 104 66 140Z" fill="#5dffae" opacity=".5" />
+          <circle cx="206" cy="86" r="22" fill="url(#gSun)" />
+          <polygon points="66,238 66,170 108,128 140,156 178,100 218,150 236,136 254,162 254,238" fill="#dbe7f3" />
+          <polygon points="178,100 218,150 196,176 164,140" fill="#9fb3c8" />
+          <rect x="66" y="204" width="188" height="34" fill="#0e2a33" />
+        </g>
+      </g>
+    </g>
+    <Sparkle x={262} y={50} />
+    <circle cx="44" cy="70" r="9" fill="#fff" />
+    <path d="M160 246 v14" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeDasharray="1 8" />
+    <g filter="url(#grain)">
+      <circle cx="160" cy="304" r="44" fill="#2b2b33" />
+    </g>
+    <circle cx="160" cy="304" r="44" fill="none" stroke="#fff" strokeWidth="6" />
+    <circle cx="160" cy="304" r="31" fill="url(#gSun)" />
+    <path d="M214 288 l10 -14 M222 306 h16 M214 324 l10 14" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" />
+    <path d="M106 288 l-10 -14 M98 306 h-16 M106 324 l-10 14" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" />
+    <circle cx="276" cy="196" r="12" fill="#fff" />
+    <circle cx="40" cy="250" r="13" fill="url(#gOrange)" />
+  </svg>
+)
+
 const STEPS = [
-  { title: 'Just Open the URL', text: 'No install needed. Open the link in your browser and start taking stamp photos right away.', art: <ArtOne /> },
-  { title: 'Totally Free', text: 'No account, no subscription, no limits. Snap as many stamps as you like.', art: <ArtTwo /> },
-  { title: 'No Server Storage', text: 'Your photos never leave your device. They are saved only in this browser, and you can delete them anytime.', art: <ArtThree /> },
+  { title: 'Instant Stamp Photos', text: 'Point, shoot, done. Your photo becomes a stamp instantly, no editing needed.', art: <ArtStamp /> },
+  { title: 'Just Open the URL', text: 'No install needed. Open the link in your browser and start taking stamp photos right away.', art: <ArtUrl /> },
+  { title: 'No Server Storage', text: 'Your photos stay on your device. Nothing is uploaded and you can delete them anytime', art: <ArtServer /> },
 ]
 
 export default function Onboarding({ onDone }) {
